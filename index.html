@@ -2,129 +2,56 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>こすげ村人ポイントカード</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>こすげ村人ポイント</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-    <meta name="theme-color" content="#006400">
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f0f4f8; color: #333; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        h1 { color: #006400; text-align: center; margin-bottom: 25px; font-size: 2em; }
-        .container {
-            background-color: #fff; border-radius: 12px; padding: 25px; margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px;
-        }
-        h2 { color: #006400; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        input[type="text"], input[type="number"] {
-            width: calc(100% - 22px); padding: 12px; margin-bottom: 18px; border: 1px solid #cce0dd;
-            border-radius: 6px; font-size: 16px; box-sizing: border-box;
-        }
-        button {
-            background-color: #007bff; color: white; padding: 12px 20px; border: none;
-            border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%;
-            transition: background-color 0.3s ease; margin-bottom: 10px;
-        }
-        button:hover:not(:disabled) { background-color: #0056b3; }
-        button:disabled { background-color: #cccccc; cursor: not-allowed; }
-
-        #scan-input-area {
-            text-align: center;
-            margin-top: 25px;
-        }
-        #scan-input {
-            font-size: 1.5em;
-            padding: 15px;
-            border: 2px solid #006400;
-            border-radius: 8px;
-            width: calc(100% - 34px);
-            text-align: center;
-            margin-bottom: 20px;
-            background-color: #e6ffe6;
-        }
-        #scan-result {
-            min-height: 80px; /* メッセージ表示のためのスペース確保 */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border: 2px dashed #006400;
-            border-radius: 12px;
-            padding: 15px;
-            background-color: #f8fcf8;
-            font-size: 1.2em;
-            color: #006400;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 15px;
-        }
-        #scan-result .message {
-            font-size: 1.5em;
-            color: #28a745;
-            margin-bottom: 5px;
-        }
-        #scan-result .member-id {
-            font-size: 1.8em;
-            color: #333;
-        }
-
-        #controls { text-align: center; margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-        #controls button { margin-bottom: 0; }
-        #sync-data { background-color: #28a745; }
-        #sync-data:hover:not(:disabled) { background-color: #218838; }
-        #reset-device { background-color: #6c757d; }
-        #reset-device:hover:not(:disabled) { background-color: #5a6268; }
-
-        #status {
-            background-color: #e9ecef; border-radius: 12px; padding: 18px; margin-top: 25px;
-            font-size: 15px; text-align: center; border: 1px solid #dee2e6;
-        }
-        #offline-queue-count { font-weight: bold; color: #dc3545; font-size: 1.1em; }
-        #last-sync-time { font-weight: bold; color: #007bff; }
-        .success { color: #28a745; font-weight: bold; }
-        .error { color: #dc3545; font-weight: bold; }
-        .info { color: #007bff; font-weight: bold; }
-
-        @media (max-width: 600px) {
-            body { padding: 15px; }
-            .container { padding: 20px; }
-            h1 { font-size: 1.8em; }
-            #controls { grid-template-columns: 1fr; }
-        }
-    </style>
+    <meta name="theme-color" content="#4CAF50">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uuid@latest/dist/umd/uuidv4.min.js"></script>
 </head>
 <body>
-    <h1>こすげ村人ポイントカード</h1>
+    <div id="app">
+        <header>
+            <h1>こすげ村人ポイント</h1>
+        </header>
 
-    <div id="settings" class="container">
-        <h2>設定</h2>
-        <label for="apps-script-url">Apps Script Web App URL:</label>
-        <input type="text" id="apps-script-url" placeholder="Your Apps Script Web App URL (末尾 /exec)">
-        <label for="store-id">店舗ID (例: 道の駅):</label>
-        <input type="text" id="store-id" placeholder="半角英数字でユニークなID">
-        <label for="point-value">付与ポイント数:</label>
-        <input type="number" id="point-value" min="1" value="1" placeholder="例: 1">
-        <button id="save-settings">設定を保存</button>
-    </div>
+        <section id="settingsSection">
+            <h2>店舗設定</h2>
+            <label for="storeId">店舗ID:</label>
+            <input type="text" id="storeId" placeholder="例: 道の駅こすげ">
+            <br>
+            <label for="points">付与ポイント:</label>
+            <input type="number" id="points" placeholder="例: 1" min="1">
+            <br>
+            <button id="saveSettings">設定を保存</button>
+            <p id="settingsStatus"></p>
+        </section>
 
-    <div id="scan-input-area" class="container">
-        <h2>QRコード読み取り</h2>
-        <input type="text" id="scan-input" placeholder="QRコードをスキャンしてください" autofocus>
-        <div id="scan-result">
-            <span class="message"></span>
-            <span class="member-id"></span>
-        </div>
-    </div>
+        <section id="scannerSection" style="display: none;">
+            <h2>QRコードリーダー</h2>
+            <div id="qr-reader" style="width: 100%; max-width: 500px; margin: auto;"></div>
+            <div id="qr-reader-results"></div>
+            <p>現在の店舗: <b id="currentStore"></b> | ポイント: <b id="currentPoints"></b> pt</p>
+            <button id="changeSettings">店舗設定を変更</button>
+        </section>
 
-    <div id="controls" class="container">
-        <button id="sync-data">データ同期</button>
-        <button id="reset-device">端末リセット</button>
-    </div>
-
-    <div id="status" class="container">
-        <p>ステータス: <span id="current-status" class="info">準備完了</span></p>
-        <p>オフラインキュー: <span id="offline-queue-count">0</span>件</p>
-        <p>最終同期: <span id="last-sync-time">未同期</span></p>
+        <section id="statusSection">
+            <h2>同期ステータス</h2>
+            <p>オンライン: <span id="onlineStatus"></span></p>
+            <p>未同期件数: <span id="queueCount">0</span>件</p>
+            <p>最終同期試行: <span id="lastSyncAttempt">なし</span></p>
+            <p>最終同期成功: <span id="lastSyncSuccess">なし</span></p>
+            <p>端末ID: <span id="deviceIdDisplay"></span></p>
+            <button id="syncNow">今すぐ同期</button>
+            <p id="syncStatus"></p>
+        </section>
+         <section id="dataManagementSection">
+            <h2>データ管理</h2>
+            <button id="clearLocalStorage">端末設定リセット</button>
+            <button id="viewQueuedData">未同期データ確認</button>
+            <div id="queuedDataDisplay" style="white-space: pre-wrap; font-family: monospace; max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; margin-top:5px; display:none;"></div>
+        </section>
     </div>
 
     <script src="app.js"></script>
